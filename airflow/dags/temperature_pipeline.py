@@ -1,10 +1,6 @@
 from airflow import DAG
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.sensors.filesystem import FileSensor
-# from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
-# from airflow.providers.common.sql.operators.sql import MsSqlOperator
-# from airflow.contrib.operators.spark_jdbc_operator import
-# from airflow.contrib.operators.spark_sql_operator
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta

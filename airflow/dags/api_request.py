@@ -5,7 +5,7 @@ import json
 
 
 def get_params():
-    f = open('./files/city.json')
+    f = open('./data/raw/city.json')
     params = json.load(f)
     s_date = params['s_date']
     e_date = params['e_date']
@@ -27,18 +27,16 @@ def get_data(url):
         r = requests.get(url)
         r.raise_for_status()
         data = r.json()
-        # date = data['daily']['time']
-        # temp = data['daily']['temperature_2m_max']
+
 
     except requests.exceptions.HTTPError as e:
         print(e.response.text)
     
     # save data to .json
 
-    with open('./files/data.json', 'w') as outfile:
+    with open('./data/raw/input_data.json', 'w') as outfile:
         json.dump(data, outfile, indent=4) 
-        # date = data['daily']['time']
-        # temp = data['daily']['temperature_2m_max']
+
 
 get_data(url)
 
