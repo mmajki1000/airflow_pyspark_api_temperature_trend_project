@@ -10,15 +10,12 @@ endpoint = get_params()[1]
 
 default_args = {
     "owner": 'airflow',
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'email': 'admin@localhost.com',
     'retries': 1,
     'retry_delay': timedelta(minutes=5)
 }
 
 with DAG("temperature_data_pipline", start_date=datetime(2023,11,1), schedule='@daily', default_args = default_args, catchup=False) as dag:
-    is_forex_rates_available = HttpSensor(
+    is_temp_data_available = HttpSensor(
         task_id='is_temperature_available',
         http_conn_id='temperature_api',
         endpoint=endpoint,
@@ -47,3 +44,5 @@ with DAG("temperature_data_pipline", start_date=datetime(2023,11,1), schedule='@
         conn_id='raw_spark_conn',
         verbose=False
     )
+
+is_temp_data_available >> is_city_file_available >> download_rate >> raw_forex_processing
