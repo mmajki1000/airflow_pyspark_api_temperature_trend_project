@@ -33,16 +33,23 @@ with DAG("temperature_data_pipline", start_date=datetime(2023,11,1), schedule='@
 
     )
 
-    download_rate = PythonOperator(
-        task_id='download_rates',
+    api_request = PythonOperator(
+        task_id='download_data',
         python_callable=get_data
     )
 
-    raw_forex_processing = SparkSubmitOperator(
-        task_id='raw_forex_processing',
-        application='./scripts/pyspark/transform.py',
+    raw_data_processing = SparkSubmitOperator(
+        task_id='raw_data_processing',
+        application='./scripts/pyspark/transform_data.py',
         conn_id='raw_spark_conn',
         verbose=False
     )
 
-is_temp_data_available >> is_city_file_available >> download_rate >> raw_forex_processing
+    data_agg = SparkSubmitOperator(
+        task_id='data_agg',
+        application='./scripts/pyspark/aggregation.py',
+        conn_id='data_agg_conn',
+        verbose=False
+    )
+
+is_temp_data_available >> is_city_file_available >> api_request >> raw_data_processing >> data_agg
