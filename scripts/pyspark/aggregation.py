@@ -13,6 +13,7 @@ df = spark.read.parquet(path)
 
 df2 = df.withColumn('year',year('date'))\
         .drop('ingestion_date')\
+        .filter(col('year') != '2023')
         
 
 df_final = df2.groupBy('city','year')\
@@ -23,19 +24,38 @@ df_final = df2.groupBy('city','year')\
         .orderBy('year')
 
 
-# plotting avg_temp
+# plotting temperatures
 
-y = [val.avg_temp for val in df_final.select('avg_temp').collect()]
-x = [val.year for val in df_final.select('year').collect()]
+year_date = [val.year for val in df_final.select('year').collect()]
+avg_temp = [val.avg_temp for val in df_final.select('avg_temp').collect()]
+min_temp = [val.min_temp for val in df_final.select('min_temp').collect()]
+max_temp = [val.max_temp for val in df_final.select('max_temp').collect()]
 
-plt.plot(x, y)
+# as 3 charts
 
-plt.ylabel('avg_temp')
-plt.xlabel('year')
-plt.title('Avg temperature over years in Wroclaw')
+fig, axs = plt.subplots(1,3, figsize=(9,6), sharey=True)
 
-# plt.show()
-plt.savefig('avg_temp_wroclaw')
+axs[0].plot(year_date, avg_temp, label='avg_temp')
+axs[1].plot(year_date, min_temp, label='min_temp')
+axs[2].plot(year_date, max_temp, label='max_temp')
+
+fig.suptitle('Temperatures over years in Wroclaw')
+
+plt.show()
+plt.savefig('Temperatures_Wroclaw_1')
+
+# as 1 chart
+
+fig, ax = plt.subplots()
+
+ax.plot(year_date, avg_temp, label='avg_temp')
+ax.plot(year_date, min_temp, label='min_temp')
+ax.plot(year_date, max_temp, label='max_temp')
+
+fig.legend()
+plt.title('Temperature over years in Wroclaw')
+plt.show()
+plt.savefig('Temperatures_Wroclaw_2')
 
 path_save = 'file:///***/data/presentation_&_viz/'
 df_final.write.option("path",path_save).saveAsTable("wroclaw_temperature",format="parquet",mode="overwrite")
